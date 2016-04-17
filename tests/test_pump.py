@@ -55,7 +55,3 @@ class PumpTest(unittest.TestCase):
         self.assertFalse(self.mock_adc.write_pin.called)
         self.assertFalse(self.mock_clock.wait.called)
 
-    def test_pump_negative_amount_raises_ValueError(self):
-        """Attempting to pump a negative amount of water raises an exception."""
-        with self.assertRaises(ValueError):
-            self.pump.pump_water(-5.0)
