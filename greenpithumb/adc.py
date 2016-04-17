@@ -28,7 +28,7 @@ class Adc(object):
         Returns:
             The signal read from the ADC pin (an int between 0 and 1023).
         """
-        raise NotImplementedError()
+        raise NotImplementedError('this is not implemented')
 
     def write_pin(self, pin, value):
         """Writes a digital value to an ADC pin.
