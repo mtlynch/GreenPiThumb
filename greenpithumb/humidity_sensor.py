@@ -1,31 +1,27 @@
-import adc
-
-#placeholder values
-_MIN_HUMIDITY_VALUE = 0
-_MAX_HUMIDITY_VALUE = 100
+import dht11_exceptions
 
 class HumiditySensor(object):
 	"""Wrapper for humidity sensor."""
 
-	def __init__(self, adc):
+	def __init__(self, dht11_result):
 		"""Creates a new HumiditySensor wrapper.
 
 		Args:
-			adc: ADC(analog to digital) interface to receive
-			analog signals from humidity sensor.
+			dht11_result: Result of a reading from a DHT11 humidity and
+			temperature sensor.   
 		"""
-		self._adc = adc
+		self._dht11_result = dht11_result
 
 	def get_humidity_level(self):
-		"""Returns humidity level as percentage."""
+		"""Returns humidity level."""
 
-		humidity_level = self._adc.read_pin(adc.PIN_HUMIDITY_SENSOR)
+		if self._dht11_result.error_code() == 1:
+			raise dht11_exceptions.MissingDataError()
+		elif self._dht11_result.error_code() == 2:
+			raise dht11_exceptions.IncorrectCRCError()
+		elif self._dht11_result.error_code() == 0:
+			humidity_level = self._dht11_result.humidity()
+		else:
+			raise ValueError("DHT11 error code out of range")
 
-		if humidity_level < _MIN_HUMIDITY_VALUE or \
-		humidity_level > _MAX_HUMIDITY_VALUE:
-			raise ValueError('Humidity sensor reading out of range')
-
-		humidity_level_as_pct = 100 * ((humidity_level - _MIN_HUMIDITY_VALUE) /
-			(_MAX_HUMIDITY_VALUE - _MIN_HUMIDITY_VALUE))
-
-		return humidity_level_as_pct
+		return humidity_level
