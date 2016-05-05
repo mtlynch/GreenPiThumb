@@ -3,36 +3,42 @@ import unittest
 
 import mock
 
-from greenpithumb import adc
 from greenpithumb import humidity_sensor
+from greenpithumb import dht11_exceptions
 
 class HumiditySensorTest(unittest.TestCase):
 
 	def setUp(self):
-		self.mock_adc = mock.Mock(spec=adc.Adc)
-		self.humidity_sensor = humidity_sensor.HumiditySensor(self.mock_adc)
+		self.mock_dht11_result = mock.Mock()
+		self.humidity_sensor = humidity_sensor.HumiditySensor(
+			self.mock_dht11_result)
 
-	def test_humidity_50_pct(self):
-		"""Midpoint humidity value should return 50.0"""
+	def test_humidity_50(self):
+		"""Value given should be value returned."""
 
-		#placeholder midpoint value
-		self.mock_adc.read_pin.return_value = 50.0
+		self.mock_dht11_result.error_code.return_value = 0
+		self.mock_dht11_result.humidity.return_value = 50.0
 		humidity_level = self.humidity_sensor.get_humidity_level()
-		self.assertAlmostEqual(humidity_level, 50.0)
+		self.assertEqual(humidity_level, 50.0)
 
-	def test_humidity_level_too_low(self):
-		"""Humidity sensor value less than min should raise a ValueError."""
+	def test_missing_data_error(self):
+		"""Error code of 1 should raise an exception."""
 
-		with self.assertRaises(ValueError):
-			self.mock_adc.read_pin.return_value = (
-				humidity_sensor._MIN_HUMIDITY_VALUE - 1)
+		with self.assertRaises(dht11_exceptions.MissingDataError):
+			self.mock_dht11_result.error_code.return_value = 1
 			self.humidity_sensor.get_humidity_level()
 
-	def test_humidity_level_too_high(self):
-		"""Humidity sensor value greater than max should raise a ValueError"""
+	def test_incorrect_crc_error(self):
+		"""Error code of 2 should raise an exception."""
+
+		with self.assertRaises(dht11_exceptions.IncorrectCRCError):
+			self.mock_dht11_result.error_code.return_value = 2
+			self.humidity_sensor.get_humidity_level()
+
+	def test_error_code_out_of_range(self):
+		"""Error code other than 0, 1, or 2 should raise an exception."""
 
 		with self.assertRaises(ValueError):
-			self.mock_adc.read_pin.return_value = (
-				humidity_sensor._MAX_HUMIDITY_VALUE + 1)
+			self.mock_dht11_result.error_code.return_value = 3
 			self.humidity_sensor.get_humidity_level()
 
