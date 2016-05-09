@@ -24,7 +24,8 @@ class HumiditySensor(object):
 				raise dht11_exceptions.MissingDataError(
 					"DHT11 sensor reported missing data")
 			elif error_code == 2:
-				raise dht11_exceptions.IncorrectCRCError()
+				raise dht11_exceptions.IncorrectCRCError(
+					"DHT11 sensor reported incorrect CRC")
 			else:
 				raise ValueError(
 					"DHT11 error code out of range: %i" % error_code)
