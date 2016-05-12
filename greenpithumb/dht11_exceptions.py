@@ -1,10 +1,13 @@
 #Custom exceptions for DHT11 sensor
 
+
 class Error(Exception):
-	pass
+    pass
+
 
 class MissingDataError(Error):
-	pass
+    pass
+
 
 class IncorrectCRCError(Error):
-	pass 
+    pass
