@@ -8,8 +8,8 @@ class HumiditySensor(object):
         """Creates a new HumiditySensor wrapper.
 
         Args:
-			dht11: Instance of DHT11 sensor reader class. 
-		"""
+        	dht11: Instance of DHT11 sensor reader class. 
+	"""
         self._dht11 = dht11
 
         def get_humidity_level(self):
