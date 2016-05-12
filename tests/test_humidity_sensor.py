@@ -11,8 +11,9 @@ class HumiditySensorTest(unittest.TestCase):
 
     def setUp(self):
         self.mock_dht11_result = mock.Mock()
-        self.humidity_sensor = humidity_sensor.HumiditySensor(mock.Mock(
-            return_value=self.mock_dht11_result))
+        mock_dht11 = mock.Mock()
+        mock_dht11.read.return_value = self.mock_dht11_result
+        self.humidity_sensor = humidity_sensor.HumiditySensor(mock_dht11)
 
     def test_humidity_50(self):
         """Value given should be value returned."""
