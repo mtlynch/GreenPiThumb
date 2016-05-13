@@ -19,8 +19,6 @@ class HumiditySensor(object):
         dht11_result = self._dht11.read()
         error_code = dht11_result.error_code
 
-        # TODO(JeetShetty): Replace error codes with constants from dht11
-        # module
         if error_code != dht11.DHT11Result.ERR_NO_ERROR:
             if error_code == dht11.DHT11Result.ERR_MISSING_DATA:
                 raise dht11_exceptions.MissingDataError(
