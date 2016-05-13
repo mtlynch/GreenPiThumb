@@ -1,5 +1,7 @@
 import dht11_exceptions
 
+from dht11 import dht11
+
 
 class HumiditySensor(object):
     """Wrapper for humidity sensor. Wraps DHT11 sensor."""
@@ -19,11 +21,11 @@ class HumiditySensor(object):
 
         # TODO(JeetShetty): Replace error codes with constants from dht11
         # module
-        if error_code != 0:
-            if error_code == 1:
+        if error_code != dht11.DHT11Result.ERR_NO_ERROR:
+            if error_code == dht11.DHT11Result.ERR_MISSING_DATA:
                 raise dht11_exceptions.MissingDataError(
                     "DHT11 sensor reported missing data")
-            elif error_code == 2:
+            elif error_code == dht11.DHT11Result.ERR_CRC:
                 raise dht11_exceptions.IncorrectCRCError(
                     "DHT11 sensor reported incorrect CRC")
             else:
