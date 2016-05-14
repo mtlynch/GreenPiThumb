@@ -1,1 +1,4 @@
-coverage run --source greenpithumb -m unittest discover
+coverage run \
+  --source greenpithumb \
+  --omit "greenpithumb/dht11/*" \
+  -m unittest discover
