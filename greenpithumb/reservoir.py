@@ -16,7 +16,7 @@ class Reservoir(object):
             weight_sensor: Weight sensor interface.
             container_weight: Reservoir container weight in grams.
         """
-        self._weight_sensor = weight_sensor
+        self._weight_sensor = weight_sensor 
         self._container_weight = container_weight
 
     def reservoir_level(self):
