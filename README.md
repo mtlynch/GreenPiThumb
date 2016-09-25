@@ -30,7 +30,6 @@ cd ..
 git clone https://github.com/JeetShetty/GreenPiThumb.git
 cd GreenPiThumb
 sudo pip install -r requirements.txt
-
 ```
 
 ### Dev Installation
