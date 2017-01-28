@@ -23,18 +23,51 @@ def _open_db(db_path):
 
 def _create_db(db_path):
     connection = _open_db(db_path)
-    parent_dir = os.path.split(__file__)[0]
-    sql_path = os.path.join(parent_dir, 'sql/create_tables.sql')
-    with open(sql_path) as sql_file:
-        connection.cursor().execute(sql_file.read())
+    cursor = connection.cursor()
+    cursor.execute("""
+        CREATE TABLE temperature
+        (
+            timestamp TEXT,
+            temperature REAL    --ambient temperature (in degrees Celsius)
+        )""")
+    cursor.execute("""
+        CREATE TABLE ambient_humidity
+        (
+            timestamp TEXT,
+            humidity REAL
+        )""")
+    cursor.execute("""
+        CREATE TABLE soil_moisture
+        (
+            timestamp TEXT,
+            soil_moisture INTEGER
+        )""")
+    cursor.execute("""
+        CREATE TABLE ambient_light
+        (
+            timestamp TEXT,
+            light REAL
+        )""")
+    cursor.execute("""
+        CREATE TABLE reservoir_level
+        (
+            timestamp TEXT,
+            level REAL  -- reservoir level (in mL)
+        )""")
+    cursor.execute("""
+        CREATE TABLE watering_events
+        (
+            timestamp TEXT,
+            water_pumped REAL   --amount of water pumped (in mL)
+        )""")
     return connection
 
 
 def open_or_create_db(db_path):
     if os.path.exists(db_path):
-        connection = _open_db(db_path)
+        return _open_db(db_path)
     else:
-        connection = _create_db(db_path)
+        return _create_db(db_path)
 
 
 class DbStoreBase(object):
