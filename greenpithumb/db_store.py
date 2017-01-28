@@ -1,4 +1,7 @@
 import collections
+import os
+import sqlite3
+
 from dateutil import parser
 
 
@@ -12,6 +15,28 @@ def _serialize_timestamp(timestamp):
         Timestamp as a string in ISO 8601 format.
     """
     return timestamp.isoformat('T')
+
+
+
+def _open_db(db_path):
+    return sqlite3.connect(db_path)
+
+
+def _create_db(db_path):
+    connection = _open_db(db_path)
+    parent_dir = os.path.split(__file__)[0]
+    sql_path = os.path.join(parent_dir, 'sql/create_tables.sql')
+    with open(sql_path) as sql_file:
+        connection.cursor().execute(sql_file.read())
+    return connection
+
+
+def open_or_create_db(db_path):
+    if os.path.exists(db_path):
+        connection = _open_db(db_path)
+    else:
+        connection = _create_db(db_path)
+
 
 
 class DbStoreBase(object):
