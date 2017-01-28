@@ -3,6 +3,7 @@ import time
 
 import Adafruit_DHT
 import Adafruit_MCP3008
+import RPi.GPIO as GPIO
 
 import clock
 import dht11
@@ -28,7 +29,9 @@ class SensorHarness(object):
         self._light_sensor = light_sensor.LightSensor(
             self._adc, wiring_config.adc_channels.light_sensor)
         self._moisture_sensor = moisture_sensor.MoistureSensor(
-            self._adc, wiring_config.adc_channels.soil_moisture_sensor)
+            self._adc, GPIO, wiring_config.adc_channels.soil_moisture_sensor,
+            wiring_config.gpio_pins.soil_moisture_1,
+            wiring_config.gpio_pins.soil_moisture_2, local_clock)
         self._dht11 = dht11.CachingDHT11(
             lambda: Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, wiring_config.gpio_pins.dht11),
             local_clock)
