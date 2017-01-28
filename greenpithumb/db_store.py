@@ -60,6 +60,7 @@ def _create_db(db_path):
             timestamp TEXT,
             water_pumped REAL   --amount of water pumped (in mL)
         )""")
+    connection.commit()
     return connection
 
 
