@@ -17,7 +17,6 @@ def _serialize_timestamp(timestamp):
     return timestamp.isoformat('T')
 
 
-
 def _open_db(db_path):
     return sqlite3.connect(db_path)
 
@@ -36,7 +35,6 @@ def open_or_create_db(db_path):
         connection = _open_db(db_path)
     else:
         connection = _create_db(db_path)
-
 
 
 class DbStoreBase(object):

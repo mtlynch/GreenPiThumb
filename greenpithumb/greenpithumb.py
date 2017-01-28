@@ -7,6 +7,7 @@ import Adafruit_MCP3008
 import RPi.GPIO as GPIO
 
 import clock
+import db_store
 import dht11
 import humidity_sensor
 import light_sensor
@@ -67,14 +68,14 @@ def read_wiring_config(config_filename):
 
 
 def main(args):
-    with contextlib.closing(db_store.open_or_create_db(args.data_file)) as db_connection:
-      pass
+    with contextlib.closing(db_store.open_or_create_db(
+            args.data_file)) as db_connection:
+        pass
     sensor_harness = SensorHarness(read_wiring_config(args.config_file))
     sensor_harness.print_readings_header()
     while True:
         sensor_harness.print_readings()
         time.sleep(args.poll_interval)
-
 
 
 if __name__ == '__main__':
