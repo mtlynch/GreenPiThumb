@@ -70,6 +70,7 @@ def read_wiring_config(config_filename):
 def main(args):
     with contextlib.closing(db_store.open_or_create_db(
             args.data_file)) as db_connection:
+        # TODO(mtlynch): Do something with database here.
         pass
     sensor_harness = SensorHarness(read_wiring_config(args.config_file))
     sensor_harness.print_readings_header()
