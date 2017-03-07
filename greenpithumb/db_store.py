@@ -4,6 +4,41 @@ import sqlite3
 
 from dateutil import parser
 
+# SQL statements to create database tables. Each statement is separated by a
+# semicolon and newline.
+_CREATE_TABLE_COMMANDS = """
+CREATE TABLE temperature
+(
+    timestamp TEXT,
+    temperature REAL    --ambient temperature (in degrees Celsius)
+);
+CREATE TABLE ambient_humidity
+(
+    timestamp TEXT,
+    humidity REAL
+);
+CREATE TABLE soil_moisture
+(
+    timestamp TEXT,
+    soil_moisture INTEGER
+);
+CREATE TABLE ambient_light
+(
+    timestamp TEXT,
+    light REAL
+);
+CREATE TABLE reservoir_level
+(
+    timestamp TEXT,
+    level REAL  -- reservoir level (in mL)
+);
+CREATE TABLE watering_events
+(
+    timestamp TEXT,
+    water_pumped REAL   --amount of water pumped (in mL)
+);
+"""
+
 
 def _serialize_timestamp(timestamp):
     """Converts a timestamp to a string.
@@ -22,44 +57,11 @@ def _open_db(db_path):
 
 
 def _create_db(db_path):
+    sql_commands = _CREATE_TABLE_COMMANDS.split(';\n')
     connection = _open_db(db_path)
     cursor = connection.cursor()
-    cursor.execute("""
-        CREATE TABLE temperature
-        (
-            timestamp TEXT,
-            temperature REAL    --ambient temperature (in degrees Celsius)
-        )""")
-    cursor.execute("""
-        CREATE TABLE ambient_humidity
-        (
-            timestamp TEXT,
-            humidity REAL
-        )""")
-    cursor.execute("""
-        CREATE TABLE soil_moisture
-        (
-            timestamp TEXT,
-            soil_moisture INTEGER
-        )""")
-    cursor.execute("""
-        CREATE TABLE ambient_light
-        (
-            timestamp TEXT,
-            light REAL
-        )""")
-    cursor.execute("""
-        CREATE TABLE reservoir_level
-        (
-            timestamp TEXT,
-            level REAL  -- reservoir level (in mL)
-        )""")
-    cursor.execute("""
-        CREATE TABLE watering_events
-        (
-            timestamp TEXT,
-            water_pumped REAL   --amount of water pumped (in mL)
-        )""")
+    for sql_command in sql_commands:
+        cursor.execute(sql_command)
     connection.commit()
     return connection
 
