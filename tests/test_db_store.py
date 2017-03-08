@@ -1,5 +1,7 @@
-import unittest
 import datetime
+import sqlite3
+import tempfile
+import unittest
 
 import mock
 from dateutil import tz
@@ -9,6 +11,19 @@ from greenpithumb import db_store
 
 # Timezone offset info for EST (UTC minus 5 hours).
 UTC_MINUS_5 = tz.tzoffset(None, -18000)
+
+
+class OpenOrCreateTest(unittest.TestCase):
+
+    @mock.patch.object(sqlite3, 'connect')
+    def test_does_not_initialize_existing_db_file(self, mock_connect):
+        mock_connection = mock.Mock()
+        mock_connect.return_value = mock_connection
+        with tempfile.NamedTemporaryFile() as temp_file:
+            db_store.open_or_create_db(temp_file.name)
+            mock_connect.assert_called_once_with(temp_file.name)
+        mock_connection.cursor.assert_not_called()
+        mock_connection.commit.assert_not_called()
 
 
 class StoreClassesTest(unittest.TestCase):
