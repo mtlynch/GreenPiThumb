@@ -1,6 +1,7 @@
 import contextlib
 import datetime
 import os
+import shutil
 import sqlite3
 import tempfile
 import unittest
@@ -17,6 +18,12 @@ UTC_MINUS_5 = tz.tzoffset(None, -18000)
 
 class OpenOrCreateTest(unittest.TestCase):
 
+    def setUp(self):
+        self._temp_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self._temp_dir)
+
     @mock.patch.object(sqlite3, 'connect')
     def test_does_not_initialize_existing_db_file(self, mock_connect):
         mock_connection = mock.Mock()
@@ -32,8 +39,7 @@ class OpenOrCreateTest(unittest.TestCase):
 
     def test_creates_file_and_tables_when_db_does_not_already_exist(self):
         # Create a path for a file that does not already exist.
-        temp_dir = tempfile.mkdtemp()
-        db_path = os.path.join(temp_dir, 'test.db')
+        db_path = os.path.join(self._temp_dir, 'test.db')
         with contextlib.closing(db_store.open_or_create_db(
                 db_path)) as connection:
             cursor = connection.cursor()
@@ -49,7 +55,6 @@ class OpenOrCreateTest(unittest.TestCase):
             cursor.execute('INSERT INTO watering_events VALUES (?, ?)',
                            ('2016-07-23T10:51:09.928000+00:00', 258.9))
             connection.commit()
-        # TODO(mtlynch): Delete temp_dir on cleanup.
 
 
 class StoreClassesTest(unittest.TestCase):
