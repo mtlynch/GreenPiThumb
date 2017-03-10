@@ -27,11 +27,6 @@ CREATE TABLE ambient_light
     timestamp TEXT,
     light REAL
 );
-CREATE TABLE reservoir_level
-(
-    timestamp TEXT,
-    level REAL  -- reservoir level (in mL)
-);
 CREATE TABLE watering_events
 (
     timestamp TEXT,
@@ -57,6 +52,18 @@ def _open_db(db_path):
 
 
 def _create_db(db_path):
+    """Creates and initializes a SQLite database with a GreenPiThumb schema.
+
+    Creates a SQLite database at the path specified and creates GreenPiThumb's
+    data tables within the database.
+
+    Args:
+        db_path: Path to where to create database file.
+
+    Returns:
+        A sqlite connection object for the database. The caller is responsible
+        for closing the object.
+    """
     sql_commands = _CREATE_TABLE_COMMANDS.split(';\n')
     connection = _open_db(db_path)
     cursor = connection.cursor()
@@ -67,6 +74,16 @@ def _create_db(db_path):
 
 
 def open_or_create_db(db_path):
+    """Opens a database file or creates one if the file does not exist.
+
+    If a file exists at the given path, opens the file at that path as a
+    database and returns a connection to it. If no file exists, creates and
+    initializes a GreenPiThumb database at the given file path.
+
+    Returns:
+        A sqlite connection object for the database. The caller is responsible
+        for closing the object.
+    """
     if os.path.exists(db_path):
         return _open_db(db_path)
     else:

@@ -103,7 +103,7 @@ if __name__ == '__main__':
               'format, such as "03:15-03:45"'))
     parser.add_argument(
         '-d',
-        '--data_file',
+        '--db_file',
         help='Location to store GreenPiThumb database file',
         default='greenpithumb/greenpithumb.db')
     main(parser.parse_args())
