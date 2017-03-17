@@ -101,7 +101,7 @@ def main(args):
     pollers = make_sensor_pollers(args.poll_interval, wiring_config,
                                   record_queue)
     with contextlib.closing(db_store.open_or_create_db(
-            args.data_file)) as db_connection:
+            args.db_file)) as db_connection:
         record_processor = create_record_processor(db_connection, record_queue)
         try:
             for current_poller in pollers:
