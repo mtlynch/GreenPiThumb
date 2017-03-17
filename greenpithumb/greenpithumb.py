@@ -54,9 +54,9 @@ def make_sensor_pollers(poll_interval, wiring_config, record_queue):
     return [
         poller.TemperaturePoller(local_clock, poll_interval,
                                  sensors['temperature'], record_queue),
-        poller.HumiditySensor(local_clock, poll_interval, sensors['humidity'],
+        poller.HumidityPoller(local_clock, poll_interval, sensors['humidity'],
                               record_queue),
-        poller.MoistureSensor(local_clock, poll_interval, sensors['sensor'],
+        poller.MoisturePoller(local_clock, poll_interval, sensors['sensor'],
                               record_queue),
         poller.AmbientLightPoller(local_clock, poll_interval, sensors['light'],
                                   record_queue),
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         '-c',
         '--config_file',
         help='Wiring config file',
-        default='wiring_config.ini')
+        default='greenpithumb/wiring_config.ini')
     parser.add_argument(
         '-s',
         '--sleep_window',
