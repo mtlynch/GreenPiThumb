@@ -1,5 +1,6 @@
 import argparse
 import contextlib
+import logging
 import Queue
 
 import Adafruit_DHT
@@ -18,8 +19,11 @@ import record_processor
 import temperature_sensor
 import wiring_config_parser
 
+logger = logging.getLogger(__name__)
+
 
 def make_sensor_pollers(poll_interval, wiring_config, record_queue):
+    logger.info('creating sensor pollers (poll interval=%d")', poll_interval)
     local_clock = clock.LocalClock()
     # The MCP3008 spec and Adafruit library use different naming for the
     # Raspberry Pi GPIO pins, so we translate as follows:
@@ -60,6 +64,7 @@ def make_sensor_pollers(poll_interval, wiring_config, record_queue):
 
 
 def read_wiring_config(config_filename):
+    logger.info('reading wiring config at "%s"', config_filename)
     with open(config_filename) as config_file:
         return wiring_config_parser.parse(config_file.read())
 
@@ -74,7 +79,23 @@ def create_record_processor(db_connection, record_queue):
                                             db_store.WateringEventStore(cursor))
 
 
+def _configure_logging(verbose):
+    """Configure the root logger for log output."""
+    root_logger = logging.getLogger()
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    root_logger.addHandler(handler)
+    if verbose:
+        root_logger.setLevel(logging.INFO)
+    else:
+        root_logger.setLevel(logging.WARNING)
+
+
 def main(args):
+    _configure_logging(args.verbose)
+    logger.info('starting greenpithumb')
     wiring_config = read_wiring_config(args.config_file)
     record_queue = Queue.Queue()
     pollers = make_sensor_pollers(args.poll_interval, wiring_config,
@@ -126,4 +147,6 @@ if __name__ == '__main__':
         '--db_file',
         help='Location to store GreenPiThumb database file',
         default='greenpithumb/greenpithumb.db')
+    parser.add_argument(
+        '-v', '--verbose', action='store_true', help='Use verbose logging')
     main(parser.parse_args())
