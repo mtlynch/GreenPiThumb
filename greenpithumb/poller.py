@@ -2,6 +2,9 @@ import threading
 
 import db_store
 
+#TODO(mtlynch): Create a sensor poller factory to simplify the creation
+# semantics.
+
 
 class SensorPollerBase(object):
     """Base class for sensor polling."""
