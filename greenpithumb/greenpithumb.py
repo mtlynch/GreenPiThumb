@@ -56,7 +56,7 @@ def make_sensor_pollers(poll_interval, wiring_config, record_queue):
                                  sensors['temperature'], record_queue),
         poller.HumidityPoller(local_clock, poll_interval, sensors['humidity'],
                               record_queue),
-        poller.MoisturePoller(local_clock, poll_interval, sensors['sensor'],
+        poller.MoisturePoller(local_clock, poll_interval, sensors['moisture'],
                               record_queue),
         poller.AmbientLightPoller(local_clock, poll_interval, sensors['light'],
                                   record_queue),
