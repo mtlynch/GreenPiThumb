@@ -79,12 +79,13 @@ def create_record_processor(db_connection, record_queue):
         db_store.WateringEventStore(db_connection))
 
 
-def _configure_logging(verbose):
+def configure_logging(verbose):
     """Configure the root logger for log output."""
     root_logger = logging.getLogger()
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+        '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+        '%Y-%m-%d %H:%M:%S')
     handler.setFormatter(formatter)
     root_logger.addHandler(handler)
     if verbose:
@@ -94,7 +95,7 @@ def _configure_logging(verbose):
 
 
 def main(args):
-    _configure_logging(args.verbose)
+    configure_logging(args.verbose)
     logger.info('starting greenpithumb')
     wiring_config = read_wiring_config(args.config_file)
     record_queue = Queue.Queue()

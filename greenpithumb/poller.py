@@ -5,10 +5,9 @@ import db_store
 
 logger = logging.getLogger(__name__)
 
+
 #TODO(mtlynch): Create a sensor poller factory to simplify the creation
 # semantics.
-
-
 class SensorPollerBase(object):
     """Base class for sensor polling."""
 
