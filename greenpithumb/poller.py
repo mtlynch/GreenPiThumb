@@ -37,7 +37,7 @@ class SensorPollerBase(object):
             seconds=self._poll_interval)
         while not self._closed.is_set() and (
                 self._local_clock.now() < next_poll_time):
-            self._local_clock.wait(0.25)
+            self._closed.wait(0.25)
 
     def start_polling_async(self):
         """Starts a new thread to begin polling."""
