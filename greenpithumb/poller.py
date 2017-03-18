@@ -1,4 +1,7 @@
+import logging
 import threading
+
+logger = logging.getLogger(__name__)
 
 
 class SensorPollerBase(object):
@@ -18,9 +21,11 @@ class SensorPollerBase(object):
 
     def _poll(self):
         """Polls at a fixed interval until caller calls close()."""
+        logger.info('polling starting for %s', self.__class__.__name__)
         while not self._closed.is_set():
             self._poll_once()
             self._local_clock.wait(self._poll_interval)
+        logger.info('polling terminating for %s', self.__class__.__name__)
 
     def start_polling_async(self):
         """Starts a new thread to begin polling."""
