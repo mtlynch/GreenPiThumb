@@ -1,4 +1,7 @@
+import datetime
 import threading
+
+_INCREMENTAL_WAIT_SECONDS = 0.25
 
 
 class SensorPollerBase(object):
@@ -20,12 +23,18 @@ class SensorPollerBase(object):
         """Polls at a fixed interval until caller calls close()."""
         while not self._closed.is_set():
             self._poll_once()
-            self._local_clock.wait(self._poll_interval)
+            self._wait_for_next_poll()
+
+    def _wait_for_next_poll(self):
+        next_poll_time = self._local_clock.now() + datetime.timedelta(
+            seconds=self._poll_interval)
+        while not self._closed.is_set() and (
+                self._local_clock.now() < next_poll_time):
+            self._closed.wait(_INCREMENTAL_WAIT_SECONDS)
 
     def start_polling_async(self):
         """Starts a new thread to begin polling."""
         t = threading.Thread(target=self._poll)
-        t.setDaemon(True)
         t.start()
 
     def close(self):
