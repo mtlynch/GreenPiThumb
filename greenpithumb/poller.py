@@ -26,6 +26,7 @@ class SensorPollerBase(object):
             self._wait_for_next_poll()
 
     def _wait_for_next_poll(self):
+        print 'now = %s' % self._local_clock.now()
         next_poll_time = self._local_clock.now() + datetime.timedelta(
             seconds=self._poll_interval)
         while not self._closed.is_set() and (

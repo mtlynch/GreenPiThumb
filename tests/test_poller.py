@@ -23,21 +23,24 @@ class PollerClassesTest(unittest.TestCase):
         self.mock_sensor = mock.Mock()
         self.mock_store = mock.Mock()
 
+    def mock_clock_wait(self, wait_time):
+        print 'wait time = %d' % wait_time
+        self.clock_wait_event.set()
+
     def test_temperature_poller(self):
         with contextlib.closing(
                 poller.TemperaturePoller(
                     self.mock_local_clock, POLL_INTERVAL, self.mock_sensor,
                     self.mock_store)) as temperature_poller:
             self.mock_local_clock.now.return_value = TIMESTAMP_A
-            self.mock_local_clock.wait.side_effect = (
-                lambda _: self.clock_wait_event.set())
+            self.mock_local_clock.wait.side_effect = self.mock_clock_wait()
             self.mock_sensor.temperature.return_value = 21.0
 
             temperature_poller.start_polling_async()
             self.clock_wait_event.wait(TEST_TIMEOUT_SECONDS)
         self.mock_store.store_temperature.assert_called_with(TIMESTAMP_A, 21.0)
         self.mock_local_clock.wait.assert_called_with(POLL_INTERVAL)
-
+"""
     def test_humidity_poller(self):
         with contextlib.closing(
                 poller.HumidityPoller(self.mock_local_clock, POLL_INTERVAL,
@@ -163,3 +166,4 @@ class CameraPollerTest(unittest.TestCase):
             camera_poller.start_polling_async()
             clock_wait_event.wait(TEST_TIMEOUT_SECONDS)
         mock_camera_manager.save_photo.assert_called()
+"""
