@@ -108,8 +108,16 @@ def main(args):
             for current_poller in pollers:
                 current_poller.start_polling_async()
             while True:
-                record_processor.process_next_record()
+                #TODO(mtlynch): Fix this so that main isn't peeking into the
+                # queue. This is a temporary hack so that a KeyboardInterrupt
+                # actually ends the program.
+                if not record_queue.empty():
+                    record_processor.process_next_record()
+                else:
+                    clock.LocalClock().wait(1)
+
         finally:
+            logger.info('exiting greenpithumb')
             for current_poller in pollers:
                 current_poller.close()
 

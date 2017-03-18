@@ -1,4 +1,3 @@
-import datetime
 import logging
 import threading
 
@@ -29,20 +28,12 @@ class SensorPollerBase(object):
         logger.info('polling starting for %s', self.__class__.__name__)
         while not self._closed.is_set():
             self._poll_once()
-            self._wait_for_next_poll()
+            self._local_clock.wait(self._poll_interval)
         logger.info('polling terminating for %s', self.__class__.__name__)
-
-    def _wait_for_next_poll(self):
-        next_poll_time = self._local_clock.now() + datetime.timedelta(
-            seconds=self._poll_interval)
-        while not self._closed.is_set() and (
-                self._local_clock.now() < next_poll_time):
-            self._local_clock.wait(0.25)
 
     def start_polling_async(self):
         """Starts a new thread to begin polling."""
         t = threading.Thread(target=self._poll)
-        t.setDaemon(True)
         t.start()
 
     def close(self):
