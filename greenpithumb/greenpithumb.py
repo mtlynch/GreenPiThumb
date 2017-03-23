@@ -89,6 +89,21 @@ def configure_logging(verbose):
         root_logger.setLevel(logging.WARNING)
 
 
+def configure_logging(verbose):
+    """Configure the root logger for log output."""
+    root_logger = logging.getLogger()
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s %(name)-15s %(levelname)-4s %(message)s',
+        '%Y-%m-%d %H:%M:%S')
+    handler.setFormatter(formatter)
+    root_logger.addHandler(handler)
+    if verbose:
+        root_logger.setLevel(logging.INFO)
+    else:
+        root_logger.setLevel(logging.WARNING)
+
+
 def main(args):
     configure_logging(args.verbose)
     logger.info('starting greenpithumb')
