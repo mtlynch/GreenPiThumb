@@ -111,16 +111,31 @@ def open_or_create_db(db_path):
 
 
 class DbStoreBase(object):
-    """Base class for storing information in a database."""
+    """Base class for storing information in a database.
 
-    def __init__(self, connection):
+    This class cannot be shared across threads.
+    """
+
+    def __init__(self, open_connection_func):
         """Creates a new DbStoreBase object for storing information.
 
         Args:
             connection: SQLite database connection.
         """
-        self._connection = connection
-        self._cursor = connection.cursor()
+        self._open_connection_func = open_connection_func
+        self._connection = None
+        self._cursor = None
+
+    def close(self):
+        if self._connection:
+            self._connection.close()
+            self._connection = None
+            self._cursor = None
+
+    def _ensure_cursor(self):
+        if not self._cursor:
+            self._connection = self._open_connection_func()
+            self._cursor = self._connection.cursor()
 
 
 class SoilMoistureStore(DbStoreBase):

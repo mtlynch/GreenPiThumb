@@ -9,26 +9,31 @@ logger = logging.getLogger(__name__)
 class SensorPollerFactory(object):
     """Factory to simplify the semantics of creating pollers."""
 
-    def __init__(self, local_clock, poll_interval, record_queue):
+    def __init__(self, local_clock, poll_interval):
         self._local_clock = local_clock
         self._poll_interval = poll_interval
-        self._record_queue = record_queue
 
-    def create_temperature_poller(self, temperature_sensor):
+    def create_temperature_poller(self, temperature_sensor, temperature_store):
         return TemperaturePoller(self._local_clock, self._poll_interval,
-                                 temperature_sensor, self._record_queue)
+                                 temperature_sensor, temperature_store)
 
-    def create_humidity_poller(self, humidity_sensor):
+    def create_humidity_poller(self, humidity_sensor, humidity_store):
         return HumidityPoller(self._local_clock, self._poll_interval,
-                              humidity_sensor, self._record_queue)
+                              humidity_sensor, humidity_store)
 
-    def create_moisture_poller(self, moisture_sensor):
+    def create_moisture_poller(self, moisture_sensor, moisture_store):
         return MoisturePoller(self._local_clock, self._poll_interval,
-                              moisture_sensor, self._record_queue)
+                              moisture_sensor, moisture_store)
 
-    def create_ambient_light_poller(self, light_sensor):
+    def create_ambient_light_poller(self, light_sensor, ambient_light_store):
         return AmbientLightPoller(self._local_clock, self._poll_interval,
-                                  light_sensor, self._record_queue)
+                                  light_sensor, ambient_light_store)
+
+    def create_watering_event_poller(self, pump_manager, soil_moisture_store,
+                                     watering_event_store):
+        return WateringEventPoller(self._local_clock, self._poll_interval,
+                                   pump_manager, soil_moisture_store,
+                                   watering_event_store)
 
 
 class SensorPollerBase(object):
@@ -69,7 +74,7 @@ class TemperaturePoller(SensorPollerBase):
     """Polls a temperature sensor and stores the readings."""
 
     def __init__(self, local_clock, poll_interval, temperature_sensor,
-                 record_queue):
+                 temperature_store):
         """Creates a new TemperaturePoller object.
 
         Args:
@@ -77,17 +82,21 @@ class TemperaturePoller(SensorPollerBase):
             poll_interval: An int of how often the sensor should be polled, in
                 seconds.
             temperature_sensor: An interface for reading the temperature.
-            record_queue: Queue on which to place temperature records for
+            temperature_store: Queue on which to place temperature records for
               storage.
         """
         super(TemperaturePoller, self).__init__(local_clock, poll_interval)
         self._temperature_sensor = temperature_sensor
-        self._record_queue = record_queue
+        self._temperature_store = temperature_store
+
+    def close(self):
+        self._temperature_store.close()
+        super(TemperaturePoller, self).close()
 
     def _poll_once(self):
         """Polls for current ambient temperature and queues DB record."""
         temperature = self._temperature_sensor.temperature()
-        self._record_queue.put(
+        self._temperature_store.insert(
             db_store.TemperatureRecord(self._local_clock.now(), temperature))
 
 
@@ -95,7 +104,7 @@ class HumidityPoller(SensorPollerBase):
     """Polls a humidity sensor and stores the readings."""
 
     def __init__(self, local_clock, poll_interval, humidity_sensor,
-                 record_queue):
+                 humidity_store):
         """Creates a new HumidityPoller object.
 
         Args:
@@ -103,16 +112,20 @@ class HumidityPoller(SensorPollerBase):
             poll_interval: An int of how often the sensor should be polled, in
                 seconds.
             humidity_sensor: An interface for reading the humidity.
-            record_queue: Queue on which to place humidity records for storage.
+            humidity_store: Queue on which to place humidity records for storage.
         """
         super(HumidityPoller, self).__init__(local_clock, poll_interval)
         self._humidity_sensor = humidity_sensor
-        self._record_queue = record_queue
+        self._humidity_store = humidity_store
+
+    def close(self):
+        self._humidity_store.close()
+        super(HumidityPoller, self).close()
 
     def _poll_once(self):
         """Polls for and stores current relative humidity."""
         humidity = self._humidity_sensor.humidity()
-        self._record_queue.put(
+        self._humidity_store.insert(
             db_store.HumidityRecord(self._local_clock.now(), humidity))
 
 
@@ -120,7 +133,7 @@ class MoisturePoller(SensorPollerBase):
     """Polls a soil moisture sensor and stores the readings."""
 
     def __init__(self, local_clock, poll_interval, moisture_sensor,
-                 record_queue):
+                 moisture_store):
         """Creates a MoisturePoller object.
 
         Args:
@@ -128,23 +141,28 @@ class MoisturePoller(SensorPollerBase):
             poll_interval: An int of how often the sensor should be polled, in
                 seconds.
             moisture_sensor: An interface for reading the soil moisture level.
-            record_queue: Queue on which to place moisture records for storage.
+            moisture_store: Queue on which to place moisture records for storage.
         """
         super(MoisturePoller, self).__init__(local_clock, poll_interval)
         self._moisture_sensor = moisture_sensor
-        self._record_queue = record_queue
+        self._moisture_store = moisture_store
+
+    def close(self):
+        self._moisture_store.close()
+        super(MoisturePoller, self).close()
 
     def _poll_once(self):
         """Polls current soil moisture."""
         soil_moisture = self._moisture_sensor.moisture()
-        self._record_queue.put(
+        self._moisture_store.insert(
             db_store.SoilMoistureRecord(self._local_clock.now(), soil_moisture))
 
 
 class AmbientLightPoller(SensorPollerBase):
     """Polls an ambient light sensor and stores the readings."""
 
-    def __init__(self, local_clock, poll_interval, light_sensor, record_queue):
+    def __init__(self, local_clock, poll_interval, light_sensor,
+                 ambient_light_store):
         """Creates a new AmbientLightPoller object.
 
         Args:
@@ -152,16 +170,20 @@ class AmbientLightPoller(SensorPollerBase):
             poll_interval: An int of how often the sensor should be polled, in
                 seconds.
             light_sensor: An interface for reading the ambient light level.
-            record_queue: Queue on which to place ambient light records for
+            ambient_light_store: Queue on which to place ambient light records for
               storage.
         """
         super(AmbientLightPoller, self).__init__(local_clock, poll_interval)
         self._light_sensor = light_sensor
-        self._record_queue = record_queue
+        self._ambient_light_store = ambient_light_store
+
+    def close(self):
+        self._ambient_light_store.close()
+        super(AmbientLightPoller, self).close()
 
     def _poll_once(self):
         ambient_light = self._light_sensor.ambient_light()
-        self._record_queue.put(
+        self._ambient_light_store.insert(
             db_store.AmbientLightRecord(self._local_clock.now(), ambient_light))
 
 
@@ -177,7 +199,7 @@ class WateringEventPoller(SensorPollerBase):
     """
 
     def __init__(self, local_clock, poll_interval, pump_manager,
-                 soil_moisture_store, record_queue):
+                 soil_moisture_store, watering_event_store):
         """Creates a new WateringEventPoller object.
 
         Args:
@@ -187,13 +209,18 @@ class WateringEventPoller(SensorPollerBase):
             pump_manager: An interface to manage a water pump.
             soil_moisture_store: An interface for retrieving soil moisture
                 readings.
-            record_queue: Queue on which to place watering event records for
-              storage.
+            watering_event_store: Queue on which to place watering event records
+              for storage.
         """
         super(WateringEventPoller, self).__init__(local_clock, poll_interval)
         self._pump_manager = pump_manager
         self._soil_moisture_store = soil_moisture_store
-        self.record_queue = record_queue
+        self._watering_event_store = watering_event_store
+
+    def close(self):
+        self._soil_moisture_store.close()
+        self._watering_event_store.close()
+        super(WateringEventPoller, self).close()
 
     def _poll_once(self):
         """Oversees a water pump, and polls for and stores watering event data.
@@ -201,11 +228,11 @@ class WateringEventPoller(SensorPollerBase):
         Polls for latest soil moisture readings and feeds them to a water pump.
         If the pump runs, it stores the event data.
         """
-        soil_moisture = self._soil_moisture_store.latest_soil_moisture()
+        soil_moisture = self._soil_moisture_store.get_latest()
         if soil_moisture:
             ml_pumped = self._pump_manager.pump_if_needed(soil_moisture)
             if ml_pumped > 0:
-                self.record_queue.put(
+                self.watering_event_store.insert(
                     db_store.WateringEventRecord(self._local_clock.now(),
                                                  ml_pumped))
 
