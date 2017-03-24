@@ -1,6 +1,6 @@
 import argparse
 import logging
-import Queue
+import time
 
 import Adafruit_DHT
 import Adafruit_MCP3008
@@ -14,7 +14,6 @@ import light_sensor
 import moisture_sensor
 import pi_io
 import poller
-import record_processor
 import temperature_sensor
 import wiring_config_parser
 
@@ -92,15 +91,14 @@ def main(args):
     configure_logging(args.verbose)
     logger.info('starting greenpithumb')
     wiring_config = read_wiring_config(args.config_file)
-    record_queue = Queue.Queue()
     open_db_connection_func = lambda: db_store.open_or_create_db(args.db_file)
     pollers = make_sensor_pollers(args.poll_interval, wiring_config,
-                                  record_queue, open_db_connection_func)
+                                  open_db_connection_func)
     try:
         for current_poller in pollers:
             current_poller.start_polling_async()
         while True:
-            record_processor.process_next_record()
+            time.sleep(1.0)
     finally:
         for current_poller in pollers:
             current_poller.close()

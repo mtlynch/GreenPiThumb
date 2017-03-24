@@ -147,6 +147,7 @@ class SoilMoistureStore(DbStoreBase):
         Args:
             soil_moisture_record: Moisture record to store.
         """
+        self._ensure_cursor()
         self._cursor.execute('INSERT INTO soil_moisture VALUES (?, ?)', (
             _serialize_timestamp(soil_moisture_record.timestamp),
             soil_moisture_record.soil_moisture))
@@ -154,6 +155,7 @@ class SoilMoistureStore(DbStoreBase):
 
     def get_latest(self):
         """Returns the most recent soil moisture reading."""
+        self._ensure_cursor()
         query = '''SELECT soil_moisture FROM soil_moisture
                 ORDER BY timestamp DESC
                 LIMIT 1;'''
@@ -171,6 +173,7 @@ class SoilMoistureStore(DbStoreBase):
         Returns:
             A list of objects with 'timestamp' and 'soil_moisture' fields.
         """
+        self._ensure_cursor()
         self._cursor.execute('SELECT * FROM soil_moisture')
         data = []
         for row in self._cursor.fetchall():
@@ -188,6 +191,7 @@ class AmbientLightStore(DbStoreBase):
         Args:
             ambient_light_record: Ambient light record to store.
         """
+        self._ensure_cursor()
         self._cursor.execute('INSERT INTO ambient_light VALUES (?, ?)', (
             _serialize_timestamp(ambient_light_record.timestamp),
             ambient_light_record.ambient_light))
@@ -199,6 +203,7 @@ class AmbientLightStore(DbStoreBase):
         Returns:
             A list of objects with 'timestamp' and 'ambient_light' fields.
         """
+        self._ensure_cursor()
         self._cursor.execute('SELECT * FROM ambient_light')
         data = []
         for row in self._cursor.fetchall():
@@ -216,6 +221,7 @@ class HumidityStore(DbStoreBase):
         Args:
             humidity_record: Humidity record to store.
         """
+        self._ensure_cursor()
         self._cursor.execute('INSERT INTO ambient_humidity VALUES (?, ?)',
                              (_serialize_timestamp(humidity_record.timestamp),
                               humidity_record.humidity))
@@ -227,6 +233,7 @@ class HumidityStore(DbStoreBase):
         Returns:
             A list of objects with 'timestamp' and 'humidity' fields.
         """
+        self._ensure_cursor()
         self._cursor.execute('SELECT * FROM ambient_humidity')
         data = []
         for row in self._cursor.fetchall():
@@ -244,6 +251,7 @@ class TemperatureStore(DbStoreBase):
         Args:
             temperature_record: Temperature record to store.
         """
+        self._ensure_cursor()
         self._cursor.execute('INSERT INTO temperature VALUES (?, ?)', (
             _serialize_timestamp(temperature_record.timestamp),
             temperature_record.temperature))
@@ -255,6 +263,7 @@ class TemperatureStore(DbStoreBase):
         Returns:
             A list of objects with 'timestamp' and 'temperature' fields.
         """
+        self._ensure_cursor()
         self._cursor.execute('SELECT * FROM temperature')
         data = []
         for row in self._cursor.fetchall():
@@ -272,6 +281,7 @@ class WateringEventStore(DbStoreBase):
         Args:
             watering_event_record: Watering event record to store.
         """
+        self._ensure_cursor()
         self._cursor.execute('INSERT INTO watering_events VALUES (?, ?)', (
             _serialize_timestamp(watering_event_record.timestamp),
             watering_event_record.water_pumped))
@@ -283,6 +293,7 @@ class WateringEventStore(DbStoreBase):
         Returns:
             A list of objects with 'timestamp' and 'water_pumped' fields.
         """
+        self._ensure_cursor()
         self._cursor.execute('SELECT * FROM watering_events')
         data = []
         for row in self._cursor.fetchall():
