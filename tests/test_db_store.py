@@ -31,7 +31,8 @@ class OpenOrCreateTest(unittest.TestCase):
         # Simulate an existing database file
         with tempfile.NamedTemporaryFile() as temp_file:
             with contextlib.closing(db_store.open_or_create_db(temp_file.name)):
-                mock_connect.assert_called_once_with(temp_file.name)
+                mock_connect.assert_called_once_with(
+                    temp_file.name, check_same_thread=False)
         # If the database already existed, we should not do anything except
         # call sqlite3.connect().
         mock_connection.cursor.assert_not_called()

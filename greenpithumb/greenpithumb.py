@@ -1,7 +1,6 @@
 import argparse
-import contextlib
 import logging
-import Queue
+import time
 
 import Adafruit_DHT
 import Adafruit_MCP3008
@@ -15,14 +14,13 @@ import light_sensor
 import moisture_sensor
 import pi_io
 import poller
-import record_processor
 import temperature_sensor
 import wiring_config_parser
 
 logger = logging.getLogger(__name__)
 
 
-def make_sensor_pollers(poll_interval, wiring_config, record_queue):
+def make_sensor_pollers(poll_interval, wiring_config, open_db_connection_func):
     logger.info('creating sensor pollers (poll interval=%d")', poll_interval)
     local_clock = clock.LocalClock()
     # The MCP3008 spec and Adafruit library use different naming for the
@@ -40,40 +38,38 @@ def make_sensor_pollers(poll_interval, wiring_config, record_queue):
         lambda: Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, wiring_config.gpio_pins.dht11),
         local_clock)
 
-    poller_factory = poller.SensorPollerFactory(local_clock, poll_interval,
-                                                record_queue)
-
-    return [
+    poller_factory = poller.SensorPollerFactory(local_clock, poll_interval)
+    pollers = []
+    pollers.append(
         poller_factory.create_temperature_poller(
-            temperature_sensor.TemperatureSensor(local_dht11)),
+            temperature_sensor.TemperatureSensor(local_dht11),
+            db_store.TemperatureStore(open_db_connection_func())))
+    pollers.append(
         poller_factory.create_humidity_poller(
-            humidity_sensor.HumiditySensor(local_dht11)),
+            humidity_sensor.HumiditySensor(local_dht11),
+            db_store.HumidityStore(open_db_connection_func())))
+    pollers.append(
         poller_factory.create_moisture_poller(
             moisture_sensor.MoistureSensor(
                 adc,
                 pi_io.IO(GPIO), wiring_config.adc_channels.soil_moisture_sensor,
                 wiring_config.gpio_pins.soil_moisture_1,
-                wiring_config.gpio_pins.soil_moisture_2, local_clock)),
+                wiring_config.gpio_pins.soil_moisture_2, local_clock),
+            db_store.SoilMoistureStore(open_db_connection_func())))
+    pollers.append(
         poller_factory.create_ambient_light_poller(
             light_sensor.LightSensor(adc,
-                                     wiring_config.adc_channels.light_sensor)),
-    ]
+                                     wiring_config.adc_channels.light_sensor),
+            db_store.AmbientLightStore(open_db_connection_func())))
+    # TODO(jeetshetty): Add watering event poller.
+
+    return pollers
 
 
 def read_wiring_config(config_filename):
     logger.info('reading wiring config at "%s"', config_filename)
     with open(config_filename) as config_file:
         return wiring_config_parser.parse(config_file.read())
-
-
-def create_record_processor(db_connection, record_queue):
-    return record_processor.RecordProcessor(
-        record_queue,
-        db_store.SoilMoistureStore(db_connection),
-        db_store.AmbientLightStore(db_connection),
-        db_store.HumidityStore(db_connection),
-        db_store.TemperatureStore(db_connection),
-        db_store.WateringEventStore(db_connection))
 
 
 def configure_logging(verbose):
@@ -95,20 +91,17 @@ def main(args):
     configure_logging(args.verbose)
     logger.info('starting greenpithumb')
     wiring_config = read_wiring_config(args.config_file)
-    record_queue = Queue.Queue()
+    open_db_connection_func = lambda: db_store.open_or_create_db(args.db_file)
     pollers = make_sensor_pollers(args.poll_interval, wiring_config,
-                                  record_queue)
-    with contextlib.closing(db_store.open_or_create_db(
-            args.db_file)) as db_connection:
-        record_processor = create_record_processor(db_connection, record_queue)
-        try:
-            for current_poller in pollers:
-                current_poller.start_polling_async()
-            while True:
-                record_processor.process_next_record()
-        finally:
-            for current_poller in pollers:
-                current_poller.close()
+                                  open_db_connection_func)
+    try:
+        for current_poller in pollers:
+            current_poller.start_polling_async()
+        while True:
+            time.sleep(1.0)
+    finally:
+        for current_poller in pollers:
+            current_poller.close()
 
 
 if __name__ == '__main__':
