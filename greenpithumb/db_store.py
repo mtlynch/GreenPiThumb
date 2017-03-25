@@ -115,7 +115,8 @@ def open_or_create_db(db_path):
 class DbStoreBase(object):
     """Base class for storing information in a database.
 
-    This class cannot be shared across threads.
+    Base class for storing or retrieving information from a database. This class
+    is not thread-safe.
     """
 
     def __init__(self, db_connection):
@@ -129,8 +130,6 @@ class DbStoreBase(object):
 
     def close(self):
         self._connection.close()
-        self._connection = None
-        self._cursor = None
 
 
 class SoilMoistureStore(DbStoreBase):

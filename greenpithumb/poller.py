@@ -83,8 +83,7 @@ class TemperaturePoller(SensorPollerBase):
             poll_interval: An int of how often the sensor should be polled, in
                 seconds.
             temperature_sensor: An interface for reading the temperature.
-            temperature_store: Queue on which to place temperature records for
-              storage.
+            temperature_store: An interface for storing temperature readings.
         """
         super(TemperaturePoller, self).__init__(local_clock, poll_interval)
         self._temperature_sensor = temperature_sensor
@@ -112,7 +111,7 @@ class HumidityPoller(SensorPollerBase):
             poll_interval: An int of how often the sensor should be polled, in
                 seconds.
             humidity_sensor: An interface for reading the humidity.
-            humidity_store: Queue on which to place humidity records for storage.
+            humidity_store: An interface for storing humidity readings.
         """
         super(HumidityPoller, self).__init__(local_clock, poll_interval)
         self._humidity_sensor = humidity_sensor
@@ -140,7 +139,7 @@ class MoisturePoller(SensorPollerBase):
             poll_interval: An int of how often the sensor should be polled, in
                 seconds.
             moisture_sensor: An interface for reading the soil moisture level.
-            moisture_store: Queue on which to place moisture records for storage.
+            moisture_store: An interface for storing soil moisture readings.
         """
         super(MoisturePoller, self).__init__(local_clock, poll_interval)
         self._moisture_sensor = moisture_sensor
@@ -168,8 +167,8 @@ class AmbientLightPoller(SensorPollerBase):
             poll_interval: An int of how often the sensor should be polled, in
                 seconds.
             light_sensor: An interface for reading the ambient light level.
-            ambient_light_store: Queue on which to place ambient light records for
-              storage.
+            ambient_light_store: An interface for storing ambient light
+              readings.
         """
         super(AmbientLightPoller, self).__init__(local_clock, poll_interval)
         self._light_sensor = light_sensor
@@ -202,8 +201,7 @@ class WateringEventPoller(SensorPollerBase):
             pump_manager: An interface to manage a water pump.
             soil_moisture_store: An interface for retrieving soil moisture
                 readings.
-            watering_event_store: Queue on which to place watering event records
-              for storage.
+            watering_event_store: An interface for storing watering event data.
         """
         super(WateringEventPoller, self).__init__(local_clock, poll_interval)
         self._pump_manager = pump_manager
