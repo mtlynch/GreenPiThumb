@@ -119,13 +119,13 @@ class DbStoreBase(object):
     is not thread-safe.
     """
 
-    def __init__(self, db_connection):
+    def __init__(self, connection):
         """Creates a new DbStoreBase object for storing information.
 
         Args:
-            db_connection: SQLite database connection.
+            connection: SQLite database connection.
         """
-        self._connection = db_connection
+        self._connection = connection
         self._cursor = self._connection.cursor()
 
     def close(self):
