@@ -43,11 +43,11 @@ def make_sensor_pollers(poll_interval, wiring_config, open_db_connection_func):
     pollers.append(
         poller_factory.create_temperature_poller(
             temperature_sensor.TemperatureSensor(local_dht11),
-            db_store.TemperatureStore(open_db_connection_func)))
+            db_store.TemperatureStore(open_db_connection_func())))
     pollers.append(
         poller_factory.create_humidity_poller(
             humidity_sensor.HumiditySensor(local_dht11),
-            db_store.HumidityStore(open_db_connection_func)))
+            db_store.HumidityStore(open_db_connection_func())))
     pollers.append(
         poller_factory.create_moisture_poller(
             moisture_sensor.MoistureSensor(
@@ -55,12 +55,12 @@ def make_sensor_pollers(poll_interval, wiring_config, open_db_connection_func):
                 pi_io.IO(GPIO), wiring_config.adc_channels.soil_moisture_sensor,
                 wiring_config.gpio_pins.soil_moisture_1,
                 wiring_config.gpio_pins.soil_moisture_2, local_clock),
-            db_store.SoilMoistureStore(open_db_connection_func)))
+            db_store.SoilMoistureStore(open_db_connection_func())))
     pollers.append(
         poller_factory.create_ambient_light_poller(
             light_sensor.LightSensor(adc,
                                      wiring_config.adc_channels.light_sensor),
-            db_store.AmbientLightStore(open_db_connection_func)))
+            db_store.AmbientLightStore(open_db_connection_func())))
     # TODO(jeetshetty): Add watering event poller.
 
     return pollers

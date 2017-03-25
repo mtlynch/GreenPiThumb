@@ -57,6 +57,7 @@ class SensorPollerBase(object):
         while not self._closed.is_set():
             self._poll_once()
             self._local_clock.wait(self._poll_interval)
+        self._close_db_stores()
         logger.info('polling terminating for %s', self.__class__.__name__)
 
     def start_polling_async(self):
@@ -89,15 +90,14 @@ class TemperaturePoller(SensorPollerBase):
         self._temperature_sensor = temperature_sensor
         self._temperature_store = temperature_store
 
-    def close(self):
-        self._temperature_store.close()
-        super(TemperaturePoller, self).close()
-
     def _poll_once(self):
         """Polls for current ambient temperature and queues DB record."""
         temperature = self._temperature_sensor.temperature()
         self._temperature_store.insert(
             db_store.TemperatureRecord(self._local_clock.now(), temperature))
+
+    def _close_db_stores(self):
+        self._temperature_store.close()
 
 
 class HumidityPoller(SensorPollerBase):
@@ -118,16 +118,14 @@ class HumidityPoller(SensorPollerBase):
         self._humidity_sensor = humidity_sensor
         self._humidity_store = humidity_store
 
-    def close(self):
-        self._humidity_store.close()
-        super(HumidityPoller, self).close()
-
     def _poll_once(self):
         """Polls for and stores current relative humidity."""
         humidity = self._humidity_sensor.humidity()
         self._humidity_store.insert(
             db_store.HumidityRecord(self._local_clock.now(), humidity))
 
+    def _close_db_stores(self):
+        self._humidity_store.close()
 
 class MoisturePoller(SensorPollerBase):
     """Polls a soil moisture sensor and stores the readings."""
@@ -147,15 +145,14 @@ class MoisturePoller(SensorPollerBase):
         self._moisture_sensor = moisture_sensor
         self._moisture_store = moisture_store
 
-    def close(self):
-        self._moisture_store.close()
-        super(MoisturePoller, self).close()
-
     def _poll_once(self):
         """Polls current soil moisture."""
         soil_moisture = self._moisture_sensor.moisture()
         self._moisture_store.insert(
             db_store.SoilMoistureRecord(self._local_clock.now(), soil_moisture))
+
+    def _close_db_stores(self):
+        self._moisture_store.close()
 
 
 class AmbientLightPoller(SensorPollerBase):
@@ -177,20 +174,15 @@ class AmbientLightPoller(SensorPollerBase):
         self._light_sensor = light_sensor
         self._ambient_light_store = ambient_light_store
 
-    def close(self):
-        self._ambient_light_store.close()
-        super(AmbientLightPoller, self).close()
-
     def _poll_once(self):
         ambient_light = self._light_sensor.ambient_light()
         self._ambient_light_store.insert(
             db_store.AmbientLightRecord(self._local_clock.now(), ambient_light))
 
+    def _close_db_stores(self):
+        self._ambient_light_store.close()
 
-# TODO(mtlynch): Fix this so that it can access soil moisture data in a
-# thread-safe way. Currently it won't be able to access the soil moisture store
-# because the thread that calls it is different from the thread that created
-# the store's DB connection.
+
 class WateringEventPoller(SensorPollerBase):
     """Polls for and records watering event data.
 
@@ -217,11 +209,6 @@ class WateringEventPoller(SensorPollerBase):
         self._soil_moisture_store = soil_moisture_store
         self._watering_event_store = watering_event_store
 
-    def close(self):
-        self._soil_moisture_store.close()
-        self._watering_event_store.close()
-        super(WateringEventPoller, self).close()
-
     def _poll_once(self):
         """Oversees a water pump, and polls for and stores watering event data.
 
@@ -235,6 +222,10 @@ class WateringEventPoller(SensorPollerBase):
                 self.watering_event_store.insert(
                     db_store.WateringEventRecord(self._local_clock.now(),
                                                  ml_pumped))
+
+    def _close_db_stores(self):
+        self._soil_moisture_store.close()
+        self._watering_event_store.close()
 
 
 class CameraPoller(SensorPollerBase):
@@ -255,3 +246,6 @@ class CameraPoller(SensorPollerBase):
     def _poll_once(self):
         """Captures and stores an image."""
         self._camera_manager.save_photo()
+
+    def _close_db_stores(self):
+        pass
