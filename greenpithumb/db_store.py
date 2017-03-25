@@ -67,7 +67,9 @@ def _serialize_timestamp(timestamp):
 
 def _open_db(db_path):
     logger.info('opening existing greenpithumb database at "%s"', db_path)
-    return sqlite3.connect(db_path)
+    # Disable same-thread checking so that callers can instantiate the
+    # connection in a different thread from the one where they'll be using it.
+    return sqlite3.connect(db_path, check_same_thread=False)
 
 
 def _create_db(db_path):
@@ -81,7 +83,7 @@ def _create_db(db_path):
 
     Returns:
         A sqlite connection object for the database. The caller is responsible
-        for closing the object.
+        for closing the object. The connection is not thread-safe.
     """
     logger.info('creating new greenpithumb database at "%s"', db_path)
     sql_commands = _CREATE_TABLE_COMMANDS.split(';\n')
@@ -102,7 +104,7 @@ def open_or_create_db(db_path):
 
     Returns:
         A sqlite connection object for the database. The caller is responsible
-        for closing the object.
+        for closing the object. The connection is not thread-safe.
     """
     if os.path.exists(db_path):
         return _open_db(db_path)
