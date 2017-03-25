@@ -127,6 +127,7 @@ class HumidityPoller(SensorPollerBase):
     def _close_db_stores(self):
         self._humidity_store.close()
 
+
 class MoisturePoller(SensorPollerBase):
     """Polls a soil moisture sensor and stores the readings."""
 
@@ -219,7 +220,7 @@ class WateringEventPoller(SensorPollerBase):
         if soil_moisture:
             ml_pumped = self._pump_manager.pump_if_needed(soil_moisture)
             if ml_pumped > 0:
-                self.watering_event_store.insert(
+                self._watering_event_store.insert(
                     db_store.WateringEventRecord(self._local_clock.now(),
                                                  ml_pumped))
 

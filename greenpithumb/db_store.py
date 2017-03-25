@@ -122,10 +122,10 @@ class DbStoreBase(object):
         """Creates a new DbStoreBase object for storing information.
 
         Args:
-            connection: SQLite database connection.
+            db_connection: SQLite database connection.
         """
         self._connection = db_connection
-        self._cursor = self_connection.cursor()
+        self._cursor = self._connection.cursor()
 
     def close(self):
         self._connection.close()
