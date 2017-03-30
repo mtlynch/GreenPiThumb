@@ -13,6 +13,7 @@ from greenpithumb import poller
 TEST_TIMEOUT_SECONDS = 1.5
 POLL_INTERVAL = 15
 TIMESTAMP_A = datetime.datetime(2016, 7, 23, 10, 51, 9, 928000, tzinfo=pytz.utc)
+# TIMESTAMP_B is on the poll interval boundary immediately after TIMESTAMP_A.
 TIMESTAMP_B = datetime.datetime(2016, 7, 23, 10, 51, 15, 0, tzinfo=pytz.utc)
 
 

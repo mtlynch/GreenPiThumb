@@ -60,7 +60,7 @@ class SensorPollerFactory(object):
 def _datetime_to_unix_time(dt):
     """Converts a datetime into seconds since UNIX epoch."""
     unix_epoch = datetime.datetime(year=1970, month=1, day=1, tzinfo=pytz.utc)
-    return (dt - unix_epoch).total_seconds()
+    return int((dt - unix_epoch).total_seconds())
 
 
 def _round_up_to_multiple(value, multiple):
@@ -128,7 +128,7 @@ class _SensorPollWorkerBase(object):
         """
         next_poll_time = _round_up_to_multiple(self._unix_now(),
                                                self._poll_interval)
-        if next_poll_time and (next_poll_time == last_poll_time):
+        if last_poll_time and (next_poll_time == last_poll_time):
             next_poll_time += self._poll_interval
         return next_poll_time
 
