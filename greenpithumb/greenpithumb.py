@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 def make_sensor_pollers(poll_interval, wiring_config, record_queue):
     logger.info('creating sensor pollers (poll interval=%d")', poll_interval)
+    utc_clock = clock.Clock()
     local_clock = clock.LocalClock()
     # The MCP3008 spec and Adafruit library use different naming for the
     # Raspberry Pi GPIO pins, so we translate as follows:
@@ -43,9 +44,9 @@ def make_sensor_pollers(poll_interval, wiring_config, record_queue):
             mosi=wiring_config.gpio_pins.mcp3008_din))
     local_dht11 = dht11.CachingDHT11(
         lambda: Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, wiring_config.gpio_pins.dht11),
-        local_clock)
+        utc_clock)
 
-    poller_factory = poller.SensorPollerFactory(local_clock, poll_interval,
+    poller_factory = poller.SensorPollerFactory(utc_clock, poll_interval,
                                                 record_queue)
 
     # Temporary PumpManager class until we finish the real class.
@@ -64,9 +65,12 @@ def make_sensor_pollers(poll_interval, wiring_config, record_queue):
         poller_factory.create_soil_watering_poller(
             moisture_sensor.MoistureSensor(
                 adc,
-                pi_io.IO(GPIO), wiring_config.adc_channels.soil_moisture_sensor,
+                pi_io.IO(GPIO),
+                wiring_config.adc_channels.soil_moisture_sensor,
                 wiring_config.gpio_pins.soil_moisture_1,
-                wiring_config.gpio_pins.soil_moisture_2, local_clock),
+                # TODO(mtlynch): Change local_clock to utc_clock.
+                wiring_config.gpio_pins.soil_moisture_2,
+                local_clock),
             pump_manager),
         poller_factory.create_ambient_light_poller(
             light_sensor.LightSensor(adc,
