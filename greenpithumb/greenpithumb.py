@@ -50,7 +50,6 @@ def make_sensor_pollers(poll_interval, wiring_config, record_queue,
         pi_io.IO(GPIO), utc_clock, wiring_config.gpio_pins.pump)
     pump_scheduler = pump.PumpScheduler(local_clock, sleep_windows)
     pump_manager = pump.PumpManager(water_pump, pump_scheduler)
-        utc_clock)
 
     poller_factory = poller.SensorPollerFactory(utc_clock, poll_interval,
                                                 record_queue)
@@ -63,11 +62,9 @@ def make_sensor_pollers(poll_interval, wiring_config, record_queue,
         poller_factory.create_soil_watering_poller(
             moisture_sensor.MoistureSensor(
                 adc,
-                pi_io.IO(GPIO),
-                wiring_config.adc_channels.soil_moisture_sensor,
+                pi_io.IO(GPIO), wiring_config.adc_channels.soil_moisture_sensor,
                 wiring_config.gpio_pins.soil_moisture_1,
-                wiring_config.gpio_pins.soil_moisture_2,
-                utc_clock),
+                wiring_config.gpio_pins.soil_moisture_2, utc_clock),
             pump_manager),
         poller_factory.create_ambient_light_poller(
             light_sensor.LightSensor(adc,
