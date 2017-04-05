@@ -68,7 +68,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and moisture level into database."""
         record = db_store.SoilMoistureRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc),
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc),
             soil_moisture=300)
         store = db_store.SoilMoistureStore(self.mock_connection)
         store.insert(record)
@@ -81,7 +81,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and moisture level into database."""
         record = db_store.SoilMoistureRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=UTC_MINUS_5),
+                2016, 7, 23, 10, 51, tzinfo=UTC_MINUS_5),
             soil_moisture=300)
         store = db_store.SoilMoistureStore(self.mock_connection)
         store.insert(record)
@@ -101,12 +101,12 @@ class StoreClassesTest(unittest.TestCase):
         self.assertEqual(
             soil_moisture_data[0].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc))
         self.assertEqual(soil_moisture_data[0].soil_moisture, 300)
         self.assertEqual(
             soil_moisture_data[1].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 52, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 52, tzinfo=pytz.utc))
         self.assertEqual(soil_moisture_data[1].soil_moisture, 400)
 
     def test_get_soil_moisture_empty_database(self):
@@ -119,7 +119,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and ambient light into database."""
         ambient_light_record = db_store.AmbientLightRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc),
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc),
             ambient_light=50.0)
         store = db_store.AmbientLightStore(self.mock_connection)
         store.insert(ambient_light_record)
@@ -132,7 +132,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and ambient light into database."""
         ambient_light_record = db_store.AmbientLightRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=UTC_MINUS_5),
+                2016, 7, 23, 10, 51, tzinfo=UTC_MINUS_5),
             ambient_light=50.0)
         store = db_store.AmbientLightStore(self.mock_connection)
         store.insert(ambient_light_record)
@@ -152,12 +152,12 @@ class StoreClassesTest(unittest.TestCase):
         self.assertEqual(
             ambient_light_data[0].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc))
         self.assertEqual(ambient_light_data[0].ambient_light, 300)
         self.assertEqual(
             ambient_light_data[1].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 52, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 52, tzinfo=pytz.utc))
         self.assertEqual(ambient_light_data[1].ambient_light, 400)
 
     def test_get_ambient_light_empty_database(self):
@@ -170,7 +170,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and humidity level into database."""
         humidity_record = db_store.HumidityRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc),
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc),
             humidity=50.0)
         store = db_store.HumidityStore(self.mock_connection)
         store.insert(humidity_record)
@@ -183,7 +183,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and humidity level into database."""
         humidity_record = db_store.HumidityRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=UTC_MINUS_5),
+                2016, 7, 23, 10, 51, tzinfo=UTC_MINUS_5),
             humidity=50.0)
         store = db_store.HumidityStore(self.mock_connection)
         store.insert(humidity_record)
@@ -202,12 +202,12 @@ class StoreClassesTest(unittest.TestCase):
         self.assertEqual(
             humidity_data[0].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc))
         self.assertEqual(humidity_data[0].humidity, 50)
         self.assertEqual(
             humidity_data[1].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 52, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 52, tzinfo=pytz.utc))
         self.assertEqual(humidity_data[1].humidity, 51)
 
     def test_get_humidity_empty_database(self):
@@ -220,7 +220,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and temperature into database."""
         temperature_record = db_store.TemperatureRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc),
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc),
             temperature=21.1)
         store = db_store.TemperatureStore(self.mock_connection)
         store.insert(temperature_record)
@@ -233,7 +233,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and temperature into database."""
         temperature_record = db_store.TemperatureRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=UTC_MINUS_5),
+                2016, 7, 23, 10, 51, tzinfo=UTC_MINUS_5),
             temperature=21.1)
         store = db_store.TemperatureStore(self.mock_connection)
         store.insert(temperature_record)
@@ -253,12 +253,12 @@ class StoreClassesTest(unittest.TestCase):
         self.assertEqual(
             temperature_data[0].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc))
         self.assertEqual(temperature_data[0].temperature, 21.0)
         self.assertEqual(
             temperature_data[1].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 52, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 52, tzinfo=pytz.utc))
         self.assertEqual(temperature_data[1].temperature, 21.5)
 
     def test_get_temperature_empty_database(self):
@@ -271,7 +271,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and volume of water pumped into database."""
         watering_event_record = db_store.WateringEventRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc),
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc),
             water_pumped=200.0)
         store = db_store.WateringEventStore(self.mock_connection)
         store.insert(watering_event_record)
@@ -284,7 +284,7 @@ class StoreClassesTest(unittest.TestCase):
         """Should insert timestamp and volume of water pumped into database."""
         watering_event_record = db_store.WateringEventRecord(
             timestamp=datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=UTC_MINUS_5),
+                2016, 7, 23, 10, 51, tzinfo=UTC_MINUS_5),
             water_pumped=200.0)
         store = db_store.WateringEventStore(self.mock_connection)
         store.insert(watering_event_record)
@@ -304,12 +304,12 @@ class StoreClassesTest(unittest.TestCase):
         self.assertEqual(
             watering_event_data[0].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 51, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 51, tzinfo=pytz.utc))
         self.assertEqual(watering_event_data[0].water_pumped, 300)
         self.assertEqual(
             watering_event_data[1].timestamp,
             datetime.datetime(
-                2016, 7, 23, 10, 52, 0, tzinfo=pytz.utc))
+                2016, 7, 23, 10, 52, tzinfo=pytz.utc))
         self.assertEqual(watering_event_data[1].water_pumped, 301)
 
     def test_get_water_pumped_empty_database(self):
