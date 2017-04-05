@@ -4,8 +4,8 @@ import os
 logger = logging.getLogger(__name__)
 
 # Format of filename to write for camera image file (assumes timestamp is in
-# UTC), as YYYY-MM-DDTHH:MM:SSZ (ISO 8601 format)
-_FILENAME_FORMAT = '%Y-%m-%dT%H%M%SZ.jpg'
+# UTC), as YYYY-MM-DDTHH:MMZ (minutes-level precision).
+_FILENAME_FORMAT = '%Y-%m-%dT%H%MZ.jpg'
 
 
 class CameraManager(object):
