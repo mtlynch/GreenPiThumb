@@ -102,7 +102,7 @@ class Scheduler(object):
             self._unix_now(), int(self._poll_interval.total_seconds()))
         if self._last_poll_time and (next_poll_time == self._last_poll_time):
             next_poll_time += int(self._poll_interval.total_seconds())
-        self._last_poll_time = next_poll_time
+
         return next_poll_time
 
     def wait_until_poll_time(self, timeout):
@@ -115,15 +115,23 @@ class Scheduler(object):
         Returns:
             True if wait to poll time completed, False if wait timed out.
         """
-        seconds_until_poll_time = self._next_poll_time() - self._unix_now()
+        next_poll_time = self._next_poll_time()
+        seconds_until_poll_time = next_poll_time - self._unix_now()
         wait_seconds = min(seconds_until_poll_time, timeout)
         if wait_seconds:
             self._clock.wait(wait_seconds)
-        # Return True if we didn't time out waiting.
-        return seconds_until_poll_time <= timeout
+        # If we didn't time out waiting, return True and update the last poll
+        # time.
+        if seconds_until_poll_time <= timeout:
+            self._last_poll_time = next_poll_time
+            return True
+        return False
 
     def last_poll_time(self):
-        return self._last_poll_time
+        if not self._last_poll_time:
+            return None
+        return datetime.datetime.utcfromtimestamp(self._last_poll_time).replace(
+            tzinfo=pytz.utc)
 
 
 class _SensorPollWorkerBase(object):
