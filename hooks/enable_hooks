@@ -1,0 +1,4 @@
+#!/bin/bash
+# Run this from the repository root to enable a git commit hook for build
+# checks.
+rm -rf .git/hooks/ && ln -s -f ../hooks .git/hooks
