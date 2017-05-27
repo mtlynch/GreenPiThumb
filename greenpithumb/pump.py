@@ -7,7 +7,7 @@ _PUMP_RATE_ML_PER_SEC = 4300.0 / 60.0
 
 # Default amount of water to add to the plant (in mL) when pump manager detects
 # low soil moisture.
-DEFAULT_PUMP_AMOUNT = 450
+DEFAULT_PUMP_AMOUNT = 200
 
 
 class Pump(object):
