@@ -15,7 +15,7 @@ class SoilMoistureSensor(object):
             pi_io: Raspberry Pi I/O interface.
             channel: ADC channel to which the moisture sensor is connected. Must
                 be an int between 0 and 7.
-            gpio_pin: The Raspberry Pi GPIO pins that the moisture sensor is
+            gpio_pin: The Raspberry Pi GPIO pin that the moisture sensor is
                 connected to. Must be an int between 2 and 27.
         """
         self._adc = adc
