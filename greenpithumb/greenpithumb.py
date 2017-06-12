@@ -91,7 +91,8 @@ def make_soil_moisture_sensor(adc, raspberry_pi_io, wiring_config):
 
 
 def make_light_sensor(adc, wiring_config):
-    light_sensor.LightSensor(adc, wiring_config.adc_channels.light_sensor)
+    return light_sensor.LightSensor(adc,
+                                    wiring_config.adc_channels.light_sensor)
 
 
 def make_camera_manager(rotation, image_path, light_sensor):
