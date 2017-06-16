@@ -69,6 +69,50 @@ class TimerTest(unittest.TestCase):
         ]  # yapf: disable
         self.assertFalse(clock.Timer(self.mock_clock, duration).expired())
 
+    def test_set_remaining_fails_when_remaining_is_longer_than_duration(self):
+        duration = datetime.timedelta(days=3)
+        self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.utc)
+        timer = clock.Timer(self.mock_clock, duration)
+        with self.assertRaises(ValueError):
+            timer.set_remaining(datetime.timedelta(days=4))
+
+    def test_set_remaining_fails_when_remaining_is_negative(self):
+        duration = datetime.timedelta(days=3)
+        self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.utc)
+        timer = clock.Timer(self.mock_clock, duration)
+        with self.assertRaises(ValueError):
+            timer.set_remaining(datetime.timedelta(days=-1))
+
+    def test_set_remaining_succeeds_when_remaining_is_zero(self):
+        duration = datetime.timedelta(days=3)
+        self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.utc)
+        timer = clock.Timer(self.mock_clock, duration)
+        timer.set_remaining(datetime.timedelta(seconds=0))
+        self.assertTrue(timer.expired())
+
+    def test_set_remaining_succeeds_when_remaining_equals_duration(self):
+        duration = datetime.timedelta(days=3)
+        self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.utc)
+        timer = clock.Timer(self.mock_clock, duration)
+        timer.set_remaining(datetime.timedelta(days=3))
+        self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 4, 0, 0, 0, 0, tzinfo=pytz.utc)
+        self.assertTrue(timer.expired())
+
+    def test_set_remaining_succeeds_when_remaining_is_less_than_duration(self):
+        duration = datetime.timedelta(days=3)
+        self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.utc)
+        timer = clock.Timer(self.mock_clock, duration)
+        timer.set_remaining(datetime.timedelta(days=1))
+        self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 2, 0, 0, 0, 0, tzinfo=pytz.utc)
+        self.assertTrue(timer.expired())
+
     def test_reset(self):
         duration = datetime.timedelta(hours=3 * 24)
         self.mock_clock.now.return_value = datetime.datetime(
