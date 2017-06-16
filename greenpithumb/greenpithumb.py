@@ -52,7 +52,14 @@ def read_wiring_config(config_filename):
 
 
 def make_adc(wiring_config):
-    """Creates ADC instance based on the given wiring_config."""
+    """Creates ADC instance based on the given wiring_config.
+
+    Args:
+        wiring_config: Wiring configuration for the GreenPiThumb.
+
+    Returns:
+        An ADC instance for the specified wiring config.
+    """
     # The MCP3008 spec and Adafruit library use different naming for the
     # Raspberry Pi GPIO pins, so we translate as follows:
     # * CLK -> CLK
@@ -117,7 +124,8 @@ def make_pump_manager(moisture_threshold, sleep_windows, raspberry_pi_io,
     """Creates a pump manager instance.
 
     Args:
-        moisture_threshold: The minimum water level before the pump turns on.
+        moisture_threshold: The minimum moisture level below which the pump
+            turns on.
         sleep_windows: Sleep windows during which pump will not turn on.
         raspberry_pi_io: pi_io instance for the GreenPiThumb.
         wiring_config: Wiring configuration for the GreenPiThumb.
@@ -145,10 +153,10 @@ def make_sensor_pollers(poll_interval, photo_interval, record_queue,
         poll_interval: The frequency at which to poll non-camera sensors.
         photo_interval: The frequency at which to capture photos.
         record_queue: Queue on which to put sensor reading records.
-        temperature_sensor: Sensor for recording temperature.
-        humidity_sensor: Sensor for recording humidity.
-        soil_moisture_sensor: Sensor for recording soil moisture.
-        light_sensor: Sensor for recording light levels.
+        temperature_sensor: Sensor for measuring temperature.
+        humidity_sensor: Sensor for measuring humidity.
+        soil_moisture_sensor: Sensor for measuring soil moisture.
+        light_sensor: Sensor for measuring light levels.
         camera_manager: Interface for capturing photos.
         pump_manager: Interface for turning water pump on and off.
 
@@ -171,9 +179,10 @@ def make_sensor_pollers(poll_interval, photo_interval, record_queue,
         poller_factory.create_humidity_poller(humidity_sensor),
         poller_factory.create_soil_watering_poller(
             soil_moisture_sensor,
-            pump_manager), poller_factory.create_light_poller(light_sensor),
+            pump_manager),
+        poller_factory.create_light_poller(light_sensor),
         camera_poller_factory.create_camera_poller(camera_manager)
-    ]
+    ]  # yapf: disable
 
 
 def create_record_processor(db_connection, record_queue):
