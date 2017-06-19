@@ -46,6 +46,17 @@ class Timer(object):
         self.reset()
 
     def set_remaining(self, time_remaining):
+        """Adjusts the remaining time on the timer.
+
+        Args:
+            time_remaining: The new amount of time remaining before the timer
+                expires. Must be a timedelta between 0 seconds and the timer
+                duration (inclusive).
+
+        Raises:
+            ValueError if time_remaining is a negative timedelta or is longer
+            than the timer's duration.
+        """
         if time_remaining < datetime.timedelta(seconds=0):
             raise ValueError('time_remaining must be non-negative')
         if time_remaining > self._duration:

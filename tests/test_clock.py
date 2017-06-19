@@ -100,6 +100,9 @@ class TimerTest(unittest.TestCase):
         timer = clock.Timer(self.mock_clock, duration)
         timer.set_remaining(datetime.timedelta(days=3))
         self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 3, 23, 59, 59, 999999, tzinfo=pytz.utc)
+        self.assertFalse(timer.expired())
+        self.mock_clock.now.return_value = datetime.datetime(
             2000, 1, 4, 0, 0, 0, 0, tzinfo=pytz.utc)
         self.assertTrue(timer.expired())
 
@@ -109,6 +112,9 @@ class TimerTest(unittest.TestCase):
             2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.utc)
         timer = clock.Timer(self.mock_clock, duration)
         timer.set_remaining(datetime.timedelta(days=1))
+        self.mock_clock.now.return_value = datetime.datetime(
+            2000, 1, 1, 23, 59, 59, 999999, tzinfo=pytz.utc)
+        self.assertFalse(timer.expired())
         self.mock_clock.now.return_value = datetime.datetime(
             2000, 1, 2, 0, 0, 0, 0, tzinfo=pytz.utc)
         self.assertTrue(timer.expired())
