@@ -150,8 +150,8 @@ def make_pump_manager(moisture_threshold, sleep_windows, raspberry_pi_io,
             (last_pump_time + pump_interval) - clock.Clock().now())
     else:
         logger.info('no previous watering found')
-        time_remaining = pump_interval
-    logger.info('max time until until next watering: %s', time_remaining)
+        time_remaining = datetime.timedelta(seconds=0)
+    logger.info('time until until next watering: %s', time_remaining)
     pump_timer.set_remaining(time_remaining)
     return pump.PumpManager(water_pump, pump_scheduler, moisture_threshold,
                             pump_amount, pump_timer)
